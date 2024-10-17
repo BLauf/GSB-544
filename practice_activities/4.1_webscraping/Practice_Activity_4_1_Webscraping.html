@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.57">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>XML, HTML, and Web Scraping</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="Practice_Activity_4_1_Webscraping_files/libs/clipboard/clipboard.min.js"></script>
+<script src="Practice_Activity_4_1_Webscraping_files/libs/quarto-html/quarto.js"></script>
+<script src="Practice_Activity_4_1_Webscraping_files/libs/quarto-html/popper.min.js"></script>
+<script src="Practice_Activity_4_1_Webscraping_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="Practice_Activity_4_1_Webscraping_files/libs/quarto-html/anchor.min.js"></script>
+<link href="Practice_Activity_4_1_Webscraping_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Practice_Activity_4_1_Webscraping_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="Practice_Activity_4_1_Webscraping_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="Practice_Activity_4_1_Webscraping_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="Practice_Activity_4_1_Webscraping_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">XML, HTML, and Web Scraping</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>JSON and XML are two different ways to represent hierarchical data. Which one is better? There are lots of articles online which discuss similarities and differences between JSON and XML and their advantages and disadvantages. Both formats are still in current usage, so it is good to be familiar with both. However, JSON is more common, so we’ll focus on working with JSON representations of hierarchical data.</p>
+<p>The reading covered an example of using Beautiful Soup to parse XML. Rather than doing another example XML now, we’ll skip straight to scraping HTML from a webpage. Both HTML and XML can be parsed in a similar way with Beautiful Soup.</p>
+<div id="cell-2" class="cell" data-execution_count="28">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="scraping-an-html-table-with-beautiful-soup" class="level2">
+<h2 class="anchored" data-anchor-id="scraping-an-html-table-with-beautiful-soup">Scraping an HTML table with Beautiful Soup</h2>
+<p>Open the URL https://en.wikipedia.org/wiki/List_of_United_States_cities_by_population and scroll down until you see a table of the cities in the U.S. with population over 100,000 (as of Jul 1, 2022). We’ll use Beautiful Soup to scrape information from this table.</p>
+<p>Read in the HTML from the ULR using the <code>requests</code> library.</p>
+<div id="cell-6" class="cell" data-execution_count="29">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># YOUR CODE HERE</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>response <span class="op">=</span> requests.get(<span class="st">"https://en.wikipedia.org/wiki/List_of_United_States_cities_by_population"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Use Beautiful Soup to parse this string into a tree called <code>soup</code></p>
+<div id="cell-8" class="cell" data-execution_count="30">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># YOUR CODE HERE</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>soup <span class="op">=</span> BeautifulSoup(response.content, <span class="st">"html.parser"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>To find an HTML tag corresponding to a specific element on a webpage, right-click on it and choose “Inspect element”. Go to the cities table Wikipedia page and do this now.</p>
+<p>You should find that the cities table on the Wikipedia page corresponds to the element</p>
+<pre><code>&lt;table class="wikitable sortable jquery-tablesorter" style="text-align:center"&gt;</code></pre>
+<p>There are many <code>&lt;table&gt;</code> tags on the page.</p>
+<div id="cell-11" class="cell" data-execution_count="31">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>tables <span class="op">=</span> soup.find_all(<span class="st">"table"</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co">#by looking at html i think its table 3 </span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>table <span class="op">=</span> tables[<span class="dv">2</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We can use attributes like <code>class=</code> and <code>style=</code> to narrow down the list.</p>
+<div id="cell-13" class="cell" data-execution_count="32">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="bu">len</span>(soup.find_all(<span class="st">"table"</span>,</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>                  attrs<span class="op">=</span>{</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>                      <span class="st">"class"</span>: <span class="st">"wikitable sortable"</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>                      <span class="st">"style"</span>: <span class="st">"text-align:center"</span>}</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>                  ))</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>                  <span class="co">#code doesn't work</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>                  </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>0</code></pre>
+</div>
+</div>
+<p>At this point, you can manually inspect the tables on the webpage to find that the one we want is the first one (see <code>[0]</code> below). We’ll store this as <code>table</code>.</p>
+<div id="cell-15" class="cell" data-execution_count="33">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>table <span class="op">=</span> soup.find_all(<span class="st">"table"</span>,</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>                  attrs<span class="op">=</span>{</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>                      <span class="st">"class"</span>: <span class="st">"wikitable sortable"</span>,</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>                      <span class="st">"style"</span>: <span class="st">"text-align:center"</span>}</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>                  )[<span class="dv">0</span>]</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>                  <span class="co">#code doesn't work</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-error">
+<div class="ansi-escaped-output">
+<pre><span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+
+<span class="ansi-red-fg">IndexError</span>                                Traceback (most recent call last)
+
+Cell <span class="ansi-green-fg">In[33], line 1</span>
+
+<span class="ansi-green-fg">----&gt; 1</span> table <span style="color:rgb(98,98,98)">=</span> soup<span style="color:rgb(98,98,98)">.</span>find_all(<span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">table</span><span style="color:rgb(175,0,0)">"</span>,
+
+<span class="ansi-green-fg ansi-bold">      2</span>                   attrs<span style="color:rgb(98,98,98)">=</span>{
+
+<span class="ansi-green-fg ansi-bold">      3</span>                       <span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">class</span><span style="color:rgb(175,0,0)">"</span>: <span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">wikitable sortable</span><span style="color:rgb(175,0,0)">"</span>,
+
+<span class="ansi-green-fg ansi-bold">      4</span>                       <span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">style</span><span style="color:rgb(175,0,0)">"</span>: <span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">text-align:center</span><span style="color:rgb(175,0,0)">"</span>}
+
+<span class="ansi-green-fg ansi-bold">      5</span>                   )[<span style="color:rgb(98,98,98)">0</span>]
+
+
+
+<span class="ansi-red-fg">IndexError</span>: list index out of range</pre>
+</div>
+</div>
+</div>
+<p><strong>Now you will write code to scrape the information in <code>table</code> to create a Pandas data frame with one row for each city and columns for: city, state, population (2022 estimate), and 2020 land area (sq mi).</strong> Refer to the Notes/suggestions below as you write your code. A few Hints are provided further down, but try coding first before looking at the hints.</p>
+<p>Notes/suggestions:</p>
+<ul>
+<li>Use as a guide the code from the reading that produced the data frame of Statistics faculty</li>
+<li>Inspect the page source as you write your code</li>
+<li>You will need to write a loop to get the information for all cities, but you might want to try just scraping the info for New York first</li>
+<li>You will need to pull the text from the tag. If <code>.text</code> returns text with “” at the end, try <code>.get_text(strip = True)</code> instead of <code>.text</code></li>
+<li>Don’t forget to convert to a Pandas Data Frame; it should have 333 rows and 4 columns</li>
+<li>The goal of this exercise is just to create the Data Frame. If you were going to use it — e.g., what is the population density for all cities in CA? — then you would need to clean the data first (to clean strings and convert to quantitative). (You can use Beautiful Soup to do some of the cleaning for you, but that goes beyond our scope.)</li>
+</ul>
+<div id="cell-18" class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># YOUR CODE HERE. ADD AS MANY CELLS AS NEEDED</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-19" class="cell" data-execution_count="34">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">#turn html into actual dataframe</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co"># initialize an empty list</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>rows <span class="op">=</span> []</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="co"># iterate over all rows in the city table</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> city <span class="kw">in</span> table.find_all(<span class="st">"tr"</span>)[<span class="dv">2</span>:]:</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Get all the cells (&lt;td&gt;) in the row.</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    cells <span class="op">=</span> city.find_all(<span class="st">"td"</span>)</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># The information we need is the text between tags.</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Find the the name of the city in cell[0]</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>    <span class="co"># which for most city is contained in the &lt;a&gt; tag</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>    city_tag <span class="op">=</span> cells[<span class="dv">0</span>].find(<span class="st">"a"</span>) <span class="kw">or</span> cells[<span class="dv">0</span>]</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>    city <span class="op">=</span> city_tag.text</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Find the office of the faculty in cell[1]</span></span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>    <span class="co"># which for most faculty is contained in the &lt;a&gt; tag</span></span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>    state_tag <span class="op">=</span> cells[<span class="dv">1</span>].find(<span class="st">"a"</span>) <span class="kw">or</span> cells[<span class="dv">1</span>]</span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>    state <span class="op">=</span> state_tag.text</span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Find the email of the faculty in cell[3]</span></span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>    <span class="co"># which for most faculty is contained in the &lt;a&gt; tag</span></span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>    estimate_2023_tag <span class="op">=</span> cells[<span class="dv">2</span>].find(<span class="st">"td"</span>) <span class="kw">or</span> cells[<span class="dv">2</span>]</span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>    estimate_2023 <span class="op">=</span> estimate_2023_tag.text</span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>    census_2020_tag <span class="op">=</span> cells[<span class="dv">3</span>].find(<span class="st">"td"</span>) <span class="kw">or</span> cells[<span class="dv">3</span>]</span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a>    census_2020 <span class="op">=</span> census_2020_tag.text</span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a>    change_tag <span class="op">=</span> cells[<span class="dv">4</span>].find(<span class="st">"td"</span>) <span class="kw">or</span> cells[<span class="dv">4</span>]</span>
+<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a>    change <span class="op">=</span> change_tag.text</span>
+<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a>    land_area_miles_squared_tag <span class="op">=</span> cells[<span class="dv">5</span>].find(<span class="st">"td"</span>) <span class="kw">or</span> cells[<span class="dv">5</span>]</span>
+<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a>    land_area_miles_squared <span class="op">=</span> land_area_miles_squared_tag.text</span>
+<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-38"><a href="#cb10-38" aria-hidden="true" tabindex="-1"></a>    land_area_kilometer_squared_tag <span class="op">=</span> cells[<span class="dv">6</span>].find(<span class="st">"td"</span>) <span class="kw">or</span> cells[<span class="dv">6</span>]</span>
+<span id="cb10-39"><a href="#cb10-39" aria-hidden="true" tabindex="-1"></a>    land_area_kilometer_squared <span class="op">=</span> land_area_kilometer_squared_tag.text</span>
+<span id="cb10-40"><a href="#cb10-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-41"><a href="#cb10-41" aria-hidden="true" tabindex="-1"></a>    density_miles_squared_tag <span class="op">=</span> cells[<span class="dv">7</span>].find(<span class="st">"td"</span>) <span class="kw">or</span> cells[<span class="dv">7</span>]</span>
+<span id="cb10-42"><a href="#cb10-42" aria-hidden="true" tabindex="-1"></a>    density_miles_squared <span class="op">=</span> density_miles_squared_tag.text</span>
+<span id="cb10-43"><a href="#cb10-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-44"><a href="#cb10-44" aria-hidden="true" tabindex="-1"></a>    density_kilometer_squared_tag <span class="op">=</span> cells[<span class="dv">8</span>].find(<span class="st">"td"</span>) <span class="kw">or</span> cells[<span class="dv">8</span>]</span>
+<span id="cb10-45"><a href="#cb10-45" aria-hidden="true" tabindex="-1"></a>    density_kilometer_squared <span class="op">=</span> density_kilometer_squared_tag.text</span>
+<span id="cb10-46"><a href="#cb10-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-47"><a href="#cb10-47" aria-hidden="true" tabindex="-1"></a>    location_tag <span class="op">=</span> cells[<span class="dv">9</span>].find(<span class="st">"small"</span>) <span class="kw">or</span> cells[<span class="dv">9</span>]</span>
+<span id="cb10-48"><a href="#cb10-48" aria-hidden="true" tabindex="-1"></a>    location <span class="op">=</span> location_tag.text</span>
+<span id="cb10-49"><a href="#cb10-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-50"><a href="#cb10-50" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Append this data.</span></span>
+<span id="cb10-51"><a href="#cb10-51" aria-hidden="true" tabindex="-1"></a>    rows.append({</span>
+<span id="cb10-52"><a href="#cb10-52" aria-hidden="true" tabindex="-1"></a>        <span class="st">"city"</span>: city,</span>
+<span id="cb10-53"><a href="#cb10-53" aria-hidden="true" tabindex="-1"></a>        <span class="st">"state"</span>: state,</span>
+<span id="cb10-54"><a href="#cb10-54" aria-hidden="true" tabindex="-1"></a>        <span class="st">"2023 estimate"</span>: estimate_2023,</span>
+<span id="cb10-55"><a href="#cb10-55" aria-hidden="true" tabindex="-1"></a>        <span class="st">"2023 census"</span>: census_2020,</span>
+<span id="cb10-56"><a href="#cb10-56" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Change"</span>: change,</span>
+<span id="cb10-57"><a href="#cb10-57" aria-hidden="true" tabindex="-1"></a>        <span class="st">"land area (miles^2)"</span>: land_area_miles_squared,</span>
+<span id="cb10-58"><a href="#cb10-58" aria-hidden="true" tabindex="-1"></a>        <span class="st">"landarea (kilometer^2)"</span>: land_area_kilometer_squared,</span>
+<span id="cb10-59"><a href="#cb10-59" aria-hidden="true" tabindex="-1"></a>        <span class="st">"density (miles^2)"</span>: density_miles_squared,</span>
+<span id="cb10-60"><a href="#cb10-60" aria-hidden="true" tabindex="-1"></a>        <span class="st">"density (kilometer^2)"</span>: density_kilometer_squared,</span>
+<span id="cb10-61"><a href="#cb10-61" aria-hidden="true" tabindex="-1"></a>        <span class="st">"location"</span>: location</span>
+<span id="cb10-62"><a href="#cb10-62" aria-hidden="true" tabindex="-1"></a>    })</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-20" class="cell" data-execution_count="35">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>pd.DataFrame(rows)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">city</th>
+<th data-quarto-table-cell-role="th">state</th>
+<th data-quarto-table-cell-role="th">2023 estimate</th>
+<th data-quarto-table-cell-role="th">2023 census</th>
+<th data-quarto-table-cell-role="th">Change</th>
+<th data-quarto-table-cell-role="th">land area (miles^2)</th>
+<th data-quarto-table-cell-role="th">landarea (kilometer^2)</th>
+<th data-quarto-table-cell-role="th">density (miles^2)</th>
+<th data-quarto-table-cell-role="th">density (kilometer^2)</th>
+<th data-quarto-table-cell-role="th">location</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>New York</td>
+<td>NY</td>
+<td>8,258,035\n</td>
+<td>8,804,190\n</td>
+<td>−6.20%\n</td>
+<td>300.5\n</td>
+<td>778.3\n</td>
+<td>29,298\n</td>
+<td>11,312\n</td>
+<td>40°40′N 73°56′W﻿ / ﻿40.66°N 73.94°W﻿ / 40.66; ...</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>Los Angeles</td>
+<td>CA</td>
+<td>3,820,914\n</td>
+<td>3,898,747\n</td>
+<td>−2.00%\n</td>
+<td>469.5\n</td>
+<td>1,216.0\n</td>
+<td>8,304\n</td>
+<td>3,206\n</td>
+<td>34°01′N 118°25′W﻿ / ﻿34.02°N 118.41°W﻿ / 34.02...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>Chicago</td>
+<td>IL</td>
+<td>2,664,452\n</td>
+<td>2,746,388\n</td>
+<td>−2.98%\n</td>
+<td>227.7\n</td>
+<td>589.7\n</td>
+<td>12,061\n</td>
+<td>4,657\n</td>
+<td>41°50′N 87°41′W﻿ / ﻿41.84°N 87.68°W﻿ / 41.84; ...</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>Houston</td>
+<td>TX</td>
+<td>2,314,157\n</td>
+<td>2,304,580\n</td>
+<td>+0.42%\n</td>
+<td>640.4\n</td>
+<td>1,658.6\n</td>
+<td>3,599\n</td>
+<td>1,390\n</td>
+<td>29°47′N 95°23′W﻿ / ﻿29.79°N 95.39°W﻿ / 29.79; ...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>Phoenix</td>
+<td>AZ</td>
+<td>1,650,070\n</td>
+<td>1,608,139\n</td>
+<td>+2.61%\n</td>
+<td>518.0\n</td>
+<td>1,341.6\n</td>
+<td>3,105\n</td>
+<td>1,199\n</td>
+<td>33°34′N 112°05′W﻿ / ﻿33.57°N 112.09°W﻿ / 33.57...</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">331</td>
+<td>Yuma</td>
+<td>AZ</td>
+<td>100,858\n</td>
+<td>95,548\n</td>
+<td>+5.56%\n</td>
+<td>120.7\n</td>
+<td>312.6\n</td>
+<td>792\n</td>
+<td>306\n</td>
+<td>32°31′N 114°31′W﻿ / ﻿32.52°N 114.52°W﻿ / 32.52...</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">332</td>
+<td>New Bedford</td>
+<td>MA</td>
+<td>100,695\n</td>
+<td>101,079\n</td>
+<td>−0.38%\n</td>
+<td>20.0\n</td>
+<td>51.8\n</td>
+<td>5,054\n</td>
+<td>1,951\n</td>
+<td>41°40′N 70°56′W﻿ / ﻿41.66°N 70.94°W﻿ / 41.66; ...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">333</td>
+<td>Suffolk</td>
+<td>VA</td>
+<td>100,659\n</td>
+<td>94,324\n</td>
+<td>+6.72%\n</td>
+<td>399.2\n</td>
+<td>1,033.9\n</td>
+<td>236\n</td>
+<td>91\n</td>
+<td>36°42′N 76°38′W﻿ / ﻿36.70°N 76.63°W﻿ / 36.70; ...</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">334</td>
+<td>Hesperia</td>
+<td>CA</td>
+<td>100,633\n</td>
+<td>99,818\n</td>
+<td>+0.82%\n</td>
+<td>72.7\n</td>
+<td>188.3\n</td>
+<td>1,373\n</td>
+<td>530\n</td>
+<td>34°24′N 117°19′W﻿ / ﻿34.40°N 117.32°W﻿ / 34.40...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">335</td>
+<td>Davenport</td>
+<td>IA</td>
+<td>100,354\n</td>
+<td>101,724\n</td>
+<td>−1.35%\n</td>
+<td>63.8\n</td>
+<td>165.2\n</td>
+<td>1,594\n</td>
+<td>615\n</td>
+<td>41°34′N 90°36′W﻿ / ﻿41.56°N 90.60°W﻿ / 41.56; ...</td>
+</tr>
+</tbody>
+</table>
+
+<p>336 rows × 10 columns</p>
+</div>
+</div>
+</div>
+<p>Hints:</p>
+<ul>
+<li>Each city is a row in the table; find all the <code>&lt;tr&gt;</code> tags to find all the cities</li>
+<li>Look for the <code>&lt;td&gt;</code> tag to see table entries within a row</li>
+<li>The rank column is represented by <code>&lt;th&gt;</code> tags, rather than <code>&lt;td&gt;</code> tags. So within a row, the first (that is, <code>[0]</code>) <code>&lt;td&gt;</code> tag corresponds to the city name.</li>
+</ul>
+</section>
+<section id="aside-scraping-an-html-table-with-pandas" class="level2">
+<h2 class="anchored" data-anchor-id="aside-scraping-an-html-table-with-pandas">Aside: Scraping an HTML table with Pandas</h2>
+<p>The Pandas command <code>read_html</code> can be used to scrape information from an HTML table on a webpage.</p>
+<p>We can call <code>read_html</code> on the URL.</p>
+<div id="cell-24" class="cell" data-execution_count="36">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>pd.read_html(<span class="st">"https://en.wikipedia.org/wiki/List_of_United_States_cities_by_population"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>[                    Population tables of U.S. cities
+ 0  The skyline of New York City, the most populou...
+ 1                                             Cities
+ 2  Population AreaDensityEthnic identityForeign-b...
+ 3                                        Urban areas
+ 4             Populous cities and metropolitan areas
+ 5                                 Metropolitan areas
+ 6  184 combined statistical areas935 core-based s...
+ 7                                        Megaregions
+ 8  See related population listsNorth American met...
+ 9                                                vte,
+     0                               1
+ 0 NaN                   State capital
+ 1 NaN              State largest city
+ 2 NaN  State capital and largest city
+ 3 NaN                 Federal capital,
+             City  ST  ... 2020 density                               Location
+             City  ST  ...        / km2                               Location
+ 0    New York[c]  NY  ...        11312    40°40′N 73°56′W﻿ / ﻿40.66°N 73.94°W
+ 1    Los Angeles  CA  ...         3206  34°01′N 118°25′W﻿ / ﻿34.02°N 118.41°W
+ 2        Chicago  IL  ...         4657    41°50′N 87°41′W﻿ / ﻿41.84°N 87.68°W
+ 3        Houston  TX  ...         1390    29°47′N 95°23′W﻿ / ﻿29.79°N 95.39°W
+ 4        Phoenix  AZ  ...         1199  33°34′N 112°05′W﻿ / ﻿33.57°N 112.09°W
+ ..           ...  ..  ...          ...                                    ...
+ 331         Yuma  AZ  ...          306  32°31′N 114°31′W﻿ / ﻿32.52°N 114.52°W
+ 332  New Bedford  MA  ...         1951    41°40′N 70°56′W﻿ / ﻿41.66°N 70.94°W
+ 333   Suffolk[l]  VA  ...           91    36°42′N 76°38′W﻿ / ﻿36.70°N 76.63°W
+ 334     Hesperia  CA  ...          530  34°24′N 117°19′W﻿ / ﻿34.40°N 117.32°W
+ 335    Davenport  IA  ...          615    41°34′N 90°36′W﻿ / ﻿41.56°N 90.60°W
+ 
+ [336 rows x 10 columns],
+         Population  Number of municipal governments
+ 0       1,000,000+                                9
+ 1  700,000–999,999                               11
+ 2  500,000–699,999                               18
+ 3  400,000–499,999                               11
+ 4  300,000–399,999                               20
+ 5  200,000–299,999                               55
+ 6  100,000–199,999                              212
+ 7            Total                              336,
+                                                 State  Number of listed cities
+ 0                                          California                       74
+ 1                                               Texas                       42
+ 2                                             Florida                       23
+ 3                                             Arizona                       13
+ 4                                            Colorado                       12
+ 5                                      North Carolina                       10
+ 6                           Massachusetts, Washington                        9
+ 7                         Georgia, Illinois, Virginia                        8
+ 8                                Michigan, New Jersey                        7
+ 9   Missouri, Indiana, New York, Ohio, Oregon, Ten...                        6
+ 10         Alabama, Connecticut, Kansas, Nevada, Utah                        5
+ 11                                Louisiana, Oklahoma                        4
+ 12  Iowa, Idaho, Minnesota, New Mexico, Pennsylvan...                        3
+ 13                       Arkansas, Kentucky, Nebraska                        2
+ 14  Alaska, District of Columbia, Hawaii, Maryland...                        1
+ 15   Delaware, Maine, Vermont, West Virginia, Wyoming                        0,
+   Municipio  2023 estimate  ...  2020 density.1                             Location
+ 0  San Juan         333005  ...       3,320/km2  18°24′N 66°04′W﻿ / ﻿18.40°N 66.06°W
+ 1   Bayamón         180835  ...       2,648/km2  18°23′N 66°10′W﻿ / ﻿18.38°N 66.16°W
+ 2  Carolina         150843  ...       2,888/km2  18°25′N 65°59′W﻿ / ﻿18.41°N 65.98°W
+ 3     Ponce         130251  ...       1,869/km2  18°00′N 66°37′W﻿ / ﻿18.00°N 66.62°W
+ 4    Caguas         124608  ...       4,507/km2  18°14′N 66°02′W﻿ / ﻿18.23°N 66.04°W
+ 
+ [5 rows x 9 columns],
+    Census- designated place  ST  ... 2020 density                               Location
+    Census- designated place  ST  ...        / km2                               Location
+ 0                 Arlington  VA  ...         3544    38°53′N 77°06′W﻿ / ﻿38.88°N 77.10°W
+ 1                Enterprise  NV  ...         1298  36°01′N 115°14′W﻿ / ﻿36.01°N 115.23°W
+ 2             Spring Valley  NV  ...         2345  36°06′N 115°16′W﻿ / ﻿36.10°N 115.26°W
+ 3             Sunrise Manor  NV  ...         2356  36°11′N 115°03′W﻿ / ﻿36.18°N 115.05°W
+ 4                  Paradise  NV  ...         1740  36°05′N 115°08′W﻿ / ﻿36.09°N 115.14°W
+ 5                  Metairie  LA  ...         2378    30°00′N 90°11′W﻿ / ﻿30.00°N 90.18°W
+ 6          East Los Angeles  CA  ...         6115  34°02′N 118°10′W﻿ / ﻿34.03°N 118.17°W
+ 7                   Brandon  FL  ...         1337    27°56′N 82°18′W﻿ / ﻿27.94°N 82.30°W
+ 8             The Woodlands  TX  ...         1020    30°10′N 95°31′W﻿ / ﻿30.17°N 95.51°W
+ 9              Lehigh Acres  FL  ...          476    26°37′N 81°38′W﻿ / ﻿26.61°N 81.64°W
+ 10              Spring Hill  FL  ...          732    28°29′N 82°32′W﻿ / ﻿28.48°N 82.53°W
+ 11                Riverview  FL  ...          898    27°49′N 82°18′W﻿ / ﻿27.82°N 82.30°W
+ 12                 Columbia  MD  ...         1267    39°12′N 76°52′W﻿ / ﻿39.20°N 76.86°W
+ 13          Highlands Ranch  CO  ...         1644  39°32′N 104°58′W﻿ / ﻿39.54°N 104.97°W
+ 
+ [14 rows x 10 columns],
+               City  ST  2023 estimate  ...  % decline from peak Peak year  Unnamed: 6
+ 0        Allegheny  PA            NaN  ...                  NaN      1907         [z]
+ 1         Brooklyn  NY            NaN  ...                  NaN      1898        [aa]
+ 2           Camden  NJ        71100.0  ...              −42.92%      1950         NaN
+ 3           Canton  OH        69197.0  ...              −40.81%      1950         NaN
+ 4   Citrus Heights  CA        86239.0  ...              −19.73%      1990         NaN
+ 5        Daly City  CA        99833.0  ...               −4.83%      2020         NaN
+ 6           Duluth  MN        87680.0  ...              −18.29%      1960         NaN
+ 7             Erie  PA        92957.0  ...              −32.85%      1960         NaN
+ 8       Fall River  MA        93840.0  ...              −22.11%      1920         NaN
+ 9      Federal Way  WA        97701.0  ...               −3.30%      2020         NaN
+ 10           Flint  MI        79661.0  ...              −59.55%      1960         NaN
+ 11            Gary  IN        67652.0  ...              −62.06%      1960         NaN
+ 12         Hammond  IN        76193.0  ...              −31.79%      1960         NaN
+ 13         Livonia  MI        92185.0  ...              −16.28%      1970         NaN
+ 14   Niagara Falls  NY        47599.0  ...              −53.51%      1960         NaN
+ 15         Norwalk  CA        98078.0  ...               −7.08%      2010         NaN
+ 16           Parma  OH        78951.0  ...              −21.22%      1970         NaN
+ 17      Portsmouth  VA        97454.0  ...              −15.09%      1960         NaN
+ 18         Reading  PA        94903.0  ...              −14.63%      1930         NaN
+ 19         Roanoke  VA        99578.0  ...               −0.64%      1980         NaN
+ 20        Scranton  PA        75805.0  ...              −47.11%      1930         NaN
+ 21      Somerville  MA        80407.0  ...              −22.62%      1930         NaN
+ 22      St. Joseph  MO        70634.0  ...              −31.41%      1900        [ab]
+ 23         Trenton  NJ        89620.0  ...              −29.99%      1950         NaN
+ 24           Utica  NY        63607.0  ...              −37.48%      1930         NaN
+ 25      Wilmington  DE        71675.0  ...              −36.29%      1940         NaN
+ 26      Youngstown  OH        59108.0  ...              −65.23%      1930         NaN
+ 
+ [27 rows x 7 columns],
+   vteThe 100 most populous cities of the United States  ...                                         Unnamed: 4
+ 0  New York, New York Los Angeles, California Chi...    ...                                                NaN
+ 1                                                NaN    ...  Chandler, Arizona North Las Vegas, Nevada Chul...
+ 2  Cities ranked by United States Census Bureau p...    ...                                                NaN
+ 
+ [3 rows x 5 columns],
+     0  ...                                                  4
+ 0 NaN  ...  Chandler, Arizona North Las Vegas, Nevada Chul...
+ 
+ [1 rows x 5 columns]]</code></pre>
+</div>
+</div>
+<p>However, this scrapes all the tables on the webpage, not just the one we want. As with Beautiful Soup, we can narrow the search by specifying the table attributes.</p>
+<div id="cell-26" class="cell" data-execution_count="37">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>pd.read_html(<span class="st">"https://en.wikipedia.org/wiki/List_of_United_States_cities_by_population"</span>, attrs <span class="op">=</span> {<span class="st">'class'</span>: <span class="st">'wikitable sortable'</span>, <span class="st">"style"</span>: <span class="st">"text-align:center"</span>})</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co">#the filtering doesn't work but can use the 3 table in wiki</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-error">
+<div class="ansi-escaped-output">
+<pre><span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+
+<span class="ansi-red-fg">ValueError</span>                                Traceback (most recent call last)
+
+Cell <span class="ansi-green-fg">In[37], line 1</span>
+
+<span class="ansi-green-fg">----&gt; 1</span> pd<span style="color:rgb(98,98,98)">.</span>read_html(<span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">https://en.wikipedia.org/wiki/List_of_United_States_cities_by_population</span><span style="color:rgb(175,0,0)">"</span>, attrs <span style="color:rgb(98,98,98)">=</span> {<span style="color:rgb(175,0,0)">'</span><span style="color:rgb(175,0,0)">class</span><span style="color:rgb(175,0,0)">'</span>: <span style="color:rgb(175,0,0)">'</span><span style="color:rgb(175,0,0)">wikitable sortable</span><span style="color:rgb(175,0,0)">'</span>, <span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">style</span><span style="color:rgb(175,0,0)">"</span>: <span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">text-align:center</span><span style="color:rgb(175,0,0)">"</span>})
+
+
+
+File <span class="ansi-green-fg">/opt/anaconda3/lib/python3.12/site-packages/pandas/io/html.py:1240</span>, in <span class="ansi-cyan-fg">read_html</span><span class="ansi-blue-fg">(io, match, flavor, header, index_col, skiprows, attrs, parse_dates, thousands, encoding, decimal, converters, na_values, keep_default_na, displayed_only, extract_links, dtype_backend, storage_options)</span>
+
+<span class="ansi-green-fg ansi-bold">   1224</span> <span style="font-weight:bold;color:rgb(0,135,0)">if</span> <span style="color:rgb(0,135,0)">isinstance</span>(io, <span style="color:rgb(0,135,0)">str</span>) <span style="font-weight:bold;color:rgb(175,0,255)">and</span> <span style="font-weight:bold;color:rgb(175,0,255)">not</span> <span style="color:rgb(0,135,0)">any</span>(
+
+<span class="ansi-green-fg ansi-bold">   1225</span>     [
+
+<span class="ansi-green-fg ansi-bold">   1226</span>         is_file_like(io),
+
+<span class="ansi-green-fg">   (...)</span>
+
+<span class="ansi-green-fg ansi-bold">   1230</span>     ]
+
+<span class="ansi-green-fg ansi-bold">   1231</span> ):
+
+<span class="ansi-green-fg ansi-bold">   1232</span>     warnings<span style="color:rgb(98,98,98)">.</span>warn(
+
+<span class="ansi-green-fg ansi-bold">   1233</span>         <span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">Passing literal html to </span><span style="color:rgb(175,0,0)">'</span><span style="color:rgb(175,0,0)">read_html</span><span style="color:rgb(175,0,0)">'</span><span style="color:rgb(175,0,0)"> is deprecated and </span><span style="color:rgb(175,0,0)">"</span>
+
+<span class="ansi-green-fg ansi-bold">   1234</span>         <span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">will be removed in a future version. To read from a </span><span style="color:rgb(175,0,0)">"</span>
+
+<span class="ansi-green-fg">   (...)</span>
+
+<span class="ansi-green-fg ansi-bold">   1237</span>         stacklevel<span style="color:rgb(98,98,98)">=</span>find_stack_level(),
+
+<span class="ansi-green-fg ansi-bold">   1238</span>     )
+
+<span class="ansi-green-fg">-&gt; 1240</span> <span style="font-weight:bold;color:rgb(0,135,0)">return</span> _parse(
+
+<span class="ansi-green-fg ansi-bold">   1241</span>     flavor<span style="color:rgb(98,98,98)">=</span>flavor,
+
+<span class="ansi-green-fg ansi-bold">   1242</span>     io<span style="color:rgb(98,98,98)">=</span>io,
+
+<span class="ansi-green-fg ansi-bold">   1243</span>     match<span style="color:rgb(98,98,98)">=</span>match,
+
+<span class="ansi-green-fg ansi-bold">   1244</span>     header<span style="color:rgb(98,98,98)">=</span>header,
+
+<span class="ansi-green-fg ansi-bold">   1245</span>     index_col<span style="color:rgb(98,98,98)">=</span>index_col,
+
+<span class="ansi-green-fg ansi-bold">   1246</span>     skiprows<span style="color:rgb(98,98,98)">=</span>skiprows,
+
+<span class="ansi-green-fg ansi-bold">   1247</span>     parse_dates<span style="color:rgb(98,98,98)">=</span>parse_dates,
+
+<span class="ansi-green-fg ansi-bold">   1248</span>     thousands<span style="color:rgb(98,98,98)">=</span>thousands,
+
+<span class="ansi-green-fg ansi-bold">   1249</span>     attrs<span style="color:rgb(98,98,98)">=</span>attrs,
+
+<span class="ansi-green-fg ansi-bold">   1250</span>     encoding<span style="color:rgb(98,98,98)">=</span>encoding,
+
+<span class="ansi-green-fg ansi-bold">   1251</span>     decimal<span style="color:rgb(98,98,98)">=</span>decimal,
+
+<span class="ansi-green-fg ansi-bold">   1252</span>     converters<span style="color:rgb(98,98,98)">=</span>converters,
+
+<span class="ansi-green-fg ansi-bold">   1253</span>     na_values<span style="color:rgb(98,98,98)">=</span>na_values,
+
+<span class="ansi-green-fg ansi-bold">   1254</span>     keep_default_na<span style="color:rgb(98,98,98)">=</span>keep_default_na,
+
+<span class="ansi-green-fg ansi-bold">   1255</span>     displayed_only<span style="color:rgb(98,98,98)">=</span>displayed_only,
+
+<span class="ansi-green-fg ansi-bold">   1256</span>     extract_links<span style="color:rgb(98,98,98)">=</span>extract_links,
+
+<span class="ansi-green-fg ansi-bold">   1257</span>     dtype_backend<span style="color:rgb(98,98,98)">=</span>dtype_backend,
+
+<span class="ansi-green-fg ansi-bold">   1258</span>     storage_options<span style="color:rgb(98,98,98)">=</span>storage_options,
+
+<span class="ansi-green-fg ansi-bold">   1259</span> )
+
+
+
+File <span class="ansi-green-fg">/opt/anaconda3/lib/python3.12/site-packages/pandas/io/html.py:1003</span>, in <span class="ansi-cyan-fg">_parse</span><span class="ansi-blue-fg">(flavor, io, match, attrs, encoding, displayed_only, extract_links, storage_options, **kwargs)</span>
+
+<span class="ansi-green-fg ansi-bold">   1001</span> <span style="font-weight:bold;color:rgb(0,135,0)">else</span>:
+
+<span class="ansi-green-fg ansi-bold">   1002</span>     <span style="font-weight:bold;color:rgb(0,135,0)">assert</span> retained <span style="font-weight:bold;color:rgb(175,0,255)">is</span> <span style="font-weight:bold;color:rgb(175,0,255)">not</span> <span style="font-weight:bold;color:rgb(0,135,0)">None</span>  <span style="font-style:italic;color:rgb(95,135,135)"># for mypy</span>
+
+<span class="ansi-green-fg">-&gt; 1003</span>     <span style="font-weight:bold;color:rgb(0,135,0)">raise</span> retained
+
+<span class="ansi-green-fg ansi-bold">   1005</span> ret <span style="color:rgb(98,98,98)">=</span> []
+
+<span class="ansi-green-fg ansi-bold">   1006</span> <span style="font-weight:bold;color:rgb(0,135,0)">for</span> table <span style="font-weight:bold;color:rgb(175,0,255)">in</span> tables:
+
+
+
+File <span class="ansi-green-fg">/opt/anaconda3/lib/python3.12/site-packages/pandas/io/html.py:983</span>, in <span class="ansi-cyan-fg">_parse</span><span class="ansi-blue-fg">(flavor, io, match, attrs, encoding, displayed_only, extract_links, storage_options, **kwargs)</span>
+
+<span class="ansi-green-fg ansi-bold">    972</span> p <span style="color:rgb(98,98,98)">=</span> parser(
+
+<span class="ansi-green-fg ansi-bold">    973</span>     io,
+
+<span class="ansi-green-fg ansi-bold">    974</span>     compiled_match,
+
+<span class="ansi-green-fg">   (...)</span>
+
+<span class="ansi-green-fg ansi-bold">    979</span>     storage_options,
+
+<span class="ansi-green-fg ansi-bold">    980</span> )
+
+<span class="ansi-green-fg ansi-bold">    982</span> <span style="font-weight:bold;color:rgb(0,135,0)">try</span>:
+
+<span class="ansi-green-fg">--&gt; 983</span>     tables <span style="color:rgb(98,98,98)">=</span> p<span style="color:rgb(98,98,98)">.</span>parse_tables()
+
+<span class="ansi-green-fg ansi-bold">    984</span> <span style="font-weight:bold;color:rgb(0,135,0)">except</span> <span style="font-weight:bold;color:rgb(215,95,95)">ValueError</span> <span style="font-weight:bold;color:rgb(0,135,0)">as</span> caught:
+
+<span class="ansi-green-fg ansi-bold">    985</span>     <span style="font-style:italic;color:rgb(95,135,135)"># if `io` is an io-like object, check if it's seekable</span>
+
+<span class="ansi-green-fg ansi-bold">    986</span>     <span style="font-style:italic;color:rgb(95,135,135)"># and try to rewind it before trying the next parser</span>
+
+<span class="ansi-green-fg ansi-bold">    987</span>     <span style="font-weight:bold;color:rgb(0,135,0)">if</span> <span style="color:rgb(0,135,0)">hasattr</span>(io, <span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">seekable</span><span style="color:rgb(175,0,0)">"</span>) <span style="font-weight:bold;color:rgb(175,0,255)">and</span> io<span style="color:rgb(98,98,98)">.</span>seekable():
+
+
+
+File <span class="ansi-green-fg">/opt/anaconda3/lib/python3.12/site-packages/pandas/io/html.py:249</span>, in <span class="ansi-cyan-fg">_HtmlFrameParser.parse_tables</span><span class="ansi-blue-fg">(self)</span>
+
+<span class="ansi-green-fg ansi-bold">    241</span> <span style="font-weight:bold;color:rgb(0,135,0)">def</span> <span style="color:rgb(0,0,255)">parse_tables</span>(<span style="color:rgb(0,135,0)">self</span>):
+
+<span class="ansi-green-fg ansi-bold">    242</span> <span style="color:rgb(188,188,188)">    </span><span style="font-style:italic;color:rgb(175,0,0)">"""</span>
+
+<span class="ansi-green-fg ansi-bold">    243</span> <span style="font-style:italic;color:rgb(175,0,0)">    Parse and return all tables from the DOM.</span>
+
+<span class="ansi-green-fg ansi-bold">    244</span> 
+
+<span class="ansi-green-fg">   (...)</span>
+
+<span class="ansi-green-fg ansi-bold">    247</span> <span style="font-style:italic;color:rgb(175,0,0)">    list of parsed (header, body, footer) tuples from tables.</span>
+
+<span class="ansi-green-fg ansi-bold">    248</span> <span style="font-style:italic;color:rgb(175,0,0)">    """</span>
+
+<span class="ansi-green-fg">--&gt; 249</span>     tables <span style="color:rgb(98,98,98)">=</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>_parse_tables(<span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>_build_doc(), <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>match, <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>attrs)
+
+<span class="ansi-green-fg ansi-bold">    250</span>     <span style="font-weight:bold;color:rgb(0,135,0)">return</span> (<span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>_parse_thead_tbody_tfoot(table) <span style="font-weight:bold;color:rgb(0,135,0)">for</span> table <span style="font-weight:bold;color:rgb(175,0,255)">in</span> tables)
+
+
+
+File <span class="ansi-green-fg">/opt/anaconda3/lib/python3.12/site-packages/pandas/io/html.py:598</span>, in <span class="ansi-cyan-fg">_BeautifulSoupHtml5LibFrameParser._parse_tables</span><span class="ansi-blue-fg">(self, document, match, attrs)</span>
+
+<span class="ansi-green-fg ansi-bold">    596</span> tables <span style="color:rgb(98,98,98)">=</span> document<span style="color:rgb(98,98,98)">.</span>find_all(element_name, attrs<span style="color:rgb(98,98,98)">=</span>attrs)
+
+<span class="ansi-green-fg ansi-bold">    597</span> <span style="font-weight:bold;color:rgb(0,135,0)">if</span> <span style="font-weight:bold;color:rgb(175,0,255)">not</span> tables:
+
+<span class="ansi-green-fg">--&gt; 598</span>     <span style="font-weight:bold;color:rgb(0,135,0)">raise</span> <span style="font-weight:bold;color:rgb(215,95,95)">ValueError</span>(<span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">No tables found</span><span style="color:rgb(175,0,0)">"</span>)
+
+<span class="ansi-green-fg ansi-bold">    600</span> result <span style="color:rgb(98,98,98)">=</span> []
+
+<span class="ansi-green-fg ansi-bold">    601</span> unique_tables <span style="color:rgb(98,98,98)">=</span> <span style="color:rgb(0,135,0)">set</span>()
+
+
+
+<span class="ansi-red-fg">ValueError</span>: No tables found</pre>
+</div>
+</div>
+</div>
+<p>This still returns 3 tables. As we remarked above, the table that we want is the first one (see <code>[0]</code> below).</p>
+<div id="cell-28" class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>df_cities2 <span class="op">=</span> pd.read_html(<span class="st">"https://en.wikipedia.org/wiki/List_of_United_States_cities_by_population"</span>)[<span class="dv">2</span>]</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>df_cities2</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co">#the filtering doesn't work but can use the 3 table in wiki</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Wait, that seemed much easier than using Beautiful Soup, and it returned a data frame, and we even got for free some formatting like removing the commas from the population! Why didn’t we just use <code>read_html</code> in the first place? It’s true the <code>read_html</code> works well when scraping information from an HTML <em>table</em>. Unfortunately, you often want to scrape information from a webpage that isn’t conveniently stored in an HTML table, in which case <code>read_html</code> won’t work. (It only searches for <code>&lt;table&gt;</code>, <code>&lt;th&gt;</code>, <code>&lt;tr&gt;</code>, and <code>&lt;td&gt;</code> tags, but there are many other HTML tags.) Though Beautiful Soup is not as simple as <code>read_html</code>, it is more flexible and thus more widely applicable.</p>
+</section>
+<section id="scraping-information-that-is-not-in-a-table-with-beautiful-soup" class="level2">
+<h2 class="anchored" data-anchor-id="scraping-information-that-is-not-in-a-table-with-beautiful-soup">Scraping information that is NOT in a <code>&lt;table&gt;</code> with Beautiful Soup</h2>
+<p>The Cal Poly course catalog http://catalog.calpoly.edu/collegesandprograms/collegeofsciencemathematics/statistics/#courseinventory contains a list of courses offered by the Statistics department. <strong>You will scrape this website to obtain a Pandas data frame with one row for each DATA or STAT course and two columns: course name and number (e.g, DATA 301. Introduction to Data Science) and term typically offered (e.g., Term Typically Offered: F, W, SP).</strong></p>
+<p>Note: Pandas <code>read_html</code> is not help here since the courses are not stored in a <code>&lt;table&gt;.</code></p>
+<div id="cell-33" class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>pd.read_html(<span class="st">"http://catalog.calpoly.edu/collegesandprograms/collegeofsciencemathematics/statistics/#courseinventory"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Notes/suggestions:</p>
+<ul>
+<li>Inspect the page source as you write your code</li>
+<li>The courses are not stored in a <code>&lt;table&gt;</code>. How are they stored?</li>
+<li>You will need to write a loop to get the information for all courses, but you might want to try just scraping the info for DATA 100 first</li>
+<li>What kind of tag is the course name stored in? What is the <code>class</code> of the tag?</li>
+<li>What kind of tag is the quarter(s) the course is offered stored in? What is the <code>class</code> of the tag? Is this the only tag of this type with the class? How will you get the one you want?</li>
+<li>You don’t have to remove the number of units (e.g., 4 units) from the course name and number, but you can try it if you want</li>
+<li>You will need to pull the text from the tag. If <code>.text</code> returns text with “” at the end, try <code>get_text(strip = True)</code> instead of <code>text</code></li>
+<li>Don’t forget to convert to a Pandas Data Frame; it should have 74 rows and 2 columns</li>
+<li>The goal of this exercise is just to create the Data Frame. If you were going to use it then you might need to clean the data first. (You can use Beautiful Soup to do some of the cleaning for you, but that goes beyond our scope.)</li>
+</ul>
+<div id="cell-35" class="cell" data-execution_count="38">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># YOUR CODE HERE</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>response <span class="op">=</span> requests.get(<span class="st">"http://catalog.calpoly.edu/collegesandprograms/collegeofsciencemathematics/statistics/#courseinventory"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-36" class="cell" data-execution_count="39">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># YOUR CODE HERE</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>soup <span class="op">=</span> BeautifulSoup(response.content, <span class="st">"html.parser"</span>)</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-37" class="cell" data-execution_count="41">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>page <span class="op">=</span> soup.find_all(<span class="st">"div"</span>,</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>                  attrs<span class="op">=</span>{</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>                      <span class="st">"id"</span>: <span class="st">"courseinventorycontainer"</span>}</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>                  )</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="bu">len</span>(page)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>1</code></pre>
+</div>
+</div>
+<div id="cell-38" class="cell" data-execution_count="45">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>page <span class="op">=</span> soup.find_all(<span class="st">"div"</span>, {<span class="st">"class"</span>: <span class="st">"courseblock"</span>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-39" class="cell" data-execution_count="76">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co">#turn html into actual dataframe</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="co"># initialize an empty list</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>rows <span class="op">=</span> []</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="co"># iterate over all vals in the courses</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="co">#each course is seperated by div</span></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> courseblock <span class="kw">in</span> page:</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># course_title</span></span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>    course_tag <span class="op">=</span> courseblock.find(<span class="st">"p"</span>, {<span class="st">"class"</span>: <span class="st">"courseblocktitle"</span>})</span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>    course <span class="op">=</span> course_tag.get_text().strip()</span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>    <span class="co">#term offered</span></span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>    term_tag <span class="op">=</span> courseblock.find(<span class="st">"div"</span>, {<span class="st">"class"</span>: <span class="st">"noindent courseextendedwrap"</span>})</span>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>    term <span class="op">=</span> term_tag.get_text().strip()</span>
+<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Append this data.</span></span>
+<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a>    rows.append({</span>
+<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a>        <span class="st">"course"</span>: course,</span>
+<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a>        <span class="st">"term offered"</span>: term</span>
+<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a>    })</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-40" class="cell" data-execution_count="77">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>pd.DataFrame(rows)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">course</th>
+<th data-quarto-table-cell-role="th">term offered</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>DATA&nbsp;100. Data Science for All I.</td>
+<td>Term Typically Offered: F, W, SP2020-21 or lat...</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>DATA&nbsp;301. Introduction to Data Science.</td>
+<td>Term Typically Offered: F, W, SPPrerequisite: ...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>DATA&nbsp;401. Data Science Process and Ethics.</td>
+<td>Term Typically Offered: FPrerequisites: DATA&nbsp;3...</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>DATA&nbsp;402. Mathematical Foundations of Data Sci...</td>
+<td>Term Typically Offered: FPrerequisites: CSC&nbsp;46...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>DATA&nbsp;403. Data Science Projects Laboratory.</td>
+<td>Term Typically Offered: FConcurrent: DATA&nbsp;401 ...</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">69</td>
+<td>STAT&nbsp;551. Statistical Learning with R.</td>
+<td>Term Typically Offered: FPrerequisite: STAT&nbsp;30...</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">70</td>
+<td>STAT&nbsp;566. Graduate Consulting Practicum.</td>
+<td>Term Typically Offered: SPPrerequisite: STAT&nbsp;4...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">71</td>
+<td>STAT&nbsp;570. Selected Advanced Topics.</td>
+<td>Term Typically Offered: TBDPrerequisite: Gradu...</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">72</td>
+<td>STAT&nbsp;590. Graduate Seminar in Statistics.</td>
+<td>Term Typically Offered: F, W, SPPrerequisite: ...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">73</td>
+<td>STAT&nbsp;599. Thesis.</td>
+<td>Term Typically Offered: TBDPrerequisite: Gradu...</td>
+</tr>
+</tbody>
+</table>
+
+<p>74 rows × 2 columns</p>
+</div>
+</div>
+</div>
+<p>Hints:</p>
+<ul>
+<li>Each course is represented by a <code>&lt;div&gt;</code> with <code>class=courseblock</code>, so you can find all the courses with <code>soup.find_all("div", {"class": "courseblock"})</code></li>
+<li>The course name is in a <code>&lt;p&gt;</code> tag with <code>class=courseblocktitle</code>, inside a <code>&lt;strong&gt;</code> tag. (Though I don’t think we need to find the strong tag here.)</li>
+<li>The term typically offered is in <code>&lt;p&gt;</code> tag with <code>class=noindent</code>. However, there are several tags with this class; term typically offered is the first one.</li>
+<li>If you want to use Beautiful Soup to remove the course units (e.g., 4 units), find the <code>&lt;span&gt;</code> tag within the course name tag and <code>.extract()</code> this span tag</li>
+</ul>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
