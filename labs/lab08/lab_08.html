@@ -8,7 +8,7 @@
 
 <meta name="author" content="Ben Laufer">
 
-<title>Lab 7 - Heart Attack</title>
+<title>Lab 8 - Linear Classifiers</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -3090,7 +3090,7 @@ vertical-align: -.125em;
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Lab 7 - Heart Attack</h1>
+<h1 class="title">Lab 8 - Linear Classifiers</h1>
 </div>
 
 
@@ -7495,8 +7495,18 @@ display: block;
 <p><strong>Q3</strong></p>
 <p>Were your metrics better or worse than in Part One? Why? Which categories were most likely to get mixed up, according to the confusion matrices? Why?</p>
 <p>Below will be the scores and the metrics used for each tuned model</p>
-<p>Part 1 (accuracy as metric): * LDA: 0.864236 * QDA: 0.851143 * SVC: 0.856746</p>
-<p>Part 2 (f1-macro as the metric): * LDA: 0.601772 * QDA: 0.6183 * KNN: 0.849676</p>
+<p>Part 1 (accuracy as metric):</p>
+<ul>
+<li>LDA: 0.864236</li>
+<li>QDA: 0.851143</li>
+<li>SVC: 0.856746</li>
+</ul>
+<p>Part 2 (f1-macro as the metric):</p>
+<ul>
+<li>LDA: 0.601772</li>
+<li>QDA: 0.6183</li>
+<li>KNN: 0.849676</li>
+</ul>
 <p>The metrics did worse in part 2 than they did in part 1. The categories that were getting the most mixed up were between hybrid and the other two classes. It was pretty easy to identify the difference bet indica and sativa.</p>
 <p>there are a few key variables (such as sleepy) that were essential in detmerining the class as indica, but other than that there weren’t really any other vactors that could easily help us differentiate the three classes from eachother. As a result there is alot of confusion between hybrid and the other few variables.</p>
 <p>As a result we can say that it is easier to distinguish sativa and indica from each other, but much more difficult to distinguish sativa, hybrid, and indica from eachother</p>
@@ -8902,8 +8912,18 @@ sklearn.utils._param_validation.InvalidParameterError: The &#39;C&#39; parameter
 <p><strong>Q2</strong></p>
 <p>Which of the six models did the best job distinguishing the target category from the rest? Which did the worst? Does this make intuitive sense?</p>
 <p>Below are the f1 scores for each of 6 tuned models shown above</p>
-<p>Logistic Regression: * Indica vs. Not Indica: 0.639379 * Sativa vs. Not Sativa: 0.405023 * Hybrid vs. Not Hybrid: 0.636773</p>
-<p>SVC: * Indica vs. Not Indica: 0.664868 * Sativa vs. Not Sativa: 0.380585 * Hybrid vs. Not Hybrid: 0.674469</p>
+<p>Logistic Regression:</p>
+<ul>
+<li>Indica vs. Not Indica: 0.639379</li>
+<li>Sativa vs. Not Sativa: 0.405023</li>
+<li>Hybrid vs. Not Hybrid: 0.636773</li>
+</ul>
+<p>SVC:</p>
+<ul>
+<li>Indica vs. Not Indica: 0.664868</li>
+<li>Sativa vs. Not Sativa: 0.380585</li>
+<li>Hybrid vs. Not Hybrid: 0.674469</li>
+</ul>
 <p>Out of the six models, the SVC hybrid vs. Not hybrid model did the best (with an f1 score of 0.674469). The SVC Indica vs. Hybrid model did the worst (with an f1 score of 0.380585). This makes sense because both hybrid and indica have traits that have distinct them for the other classes. Because we are now dealing with a hybrid not hybrid situation we now have a binary response variable and because there are few variables that can help distinguish hybrid (such as focused) it is easier to determine. Additionally because the boundaries are better set, this meeans that SVC will out perform logistic regressions due to finding an optimal boundaries</p>
 <p>Additionally, we can see that sativa vs. not sativa scored the lowest overall, this can be because due to the fact that there is a lot of characteristics shared between hybrid and sativa making it way harder to classifer sativa.</p>
 <p><strong>Q3</strong></p>
